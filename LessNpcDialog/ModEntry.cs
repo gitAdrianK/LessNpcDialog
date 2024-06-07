@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿using BehaviorTree;
+using HarmonyLib;
 using JumpKing.MiscEntities.OldMan;
 using JumpKing.Mods;
 using JumpKing.PauseMenu;
@@ -34,7 +35,6 @@ namespace LessNpcDialog
         {
             AssemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
-            // try reading config file
             try
             {
                 Preferences = XmlSerializerHelper.Deserialize<Preferences>($@"{AssemblyPath}\{SETTINGS_FILE}");
@@ -44,19 +44,25 @@ namespace LessNpcDialog
                 Debug.WriteLine($"[ERROR] [{IDENTIFIER}] {e.Message}");
                 Preferences = new Preferences();
             }
+            Preferences.PropertyChanged += SaveSettingsOnFile;
+
             Harmony harmony = new Harmony(HARMONY_IDENTIFIER);
             MethodInfo sayLineMyRun = typeof(SayLine).GetMethod("MyRun", BindingFlags.NonPublic | BindingFlags.Instance);
             HarmonyMethod preventTalk = new HarmonyMethod(AccessTools.Method(typeof(ModEntry), nameof(PreventTalk)));
-            Debugger.Log(1, "", (sayLineMyRun != null) + "\n");
             harmony.Patch(
                 sayLineMyRun,
                 prefix: preventTalk
             );
         }
 
-        public static bool PreventTalk()
+        public static bool PreventTalk(ref BTresult __result)
         {
-            return !Preferences.IsEnabled;
+            if (Preferences.IsEnabled)
+            {
+                __result = BTresult.Success;
+                return false;
+            }
+            return true;
         }
 
         private static void SaveSettingsOnFile(object sender, System.ComponentModel.PropertyChangedEventArgs args)
