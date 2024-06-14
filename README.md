@@ -1,3 +1,3 @@
-Gives you the option to not have NPCs dialog be displayed.
+Gives you the ability to turn off NPC dialog.
 
 [Mod](https://steamcommunity.com/sharedfiles/filedetails/?id=3262816502).
