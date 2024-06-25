@@ -10,7 +10,7 @@ using System.Reflection;
 
 namespace LessNpcDialog
 {
-    [JumpKingMod("Zebra.LessNpcDialog")]
+    [JumpKingMod(IDENTIFIER)]
     public static class ModEntry
     {
         const string IDENTIFIER = "Zebra.LessNpcDialog";
@@ -48,11 +48,10 @@ namespace LessNpcDialog
 
             Harmony harmony = new Harmony(HARMONY_IDENTIFIER);
             MethodInfo sayLineMyRun = typeof(SayLine).GetMethod("MyRun", BindingFlags.NonPublic | BindingFlags.Instance);
-            HarmonyMethod preventTalk = new HarmonyMethod(AccessTools.Method(typeof(ModEntry), nameof(PreventTalk)));
+            HarmonyMethod preventTalk = new HarmonyMethod(typeof(ModEntry).GetMethod(nameof(PreventTalk)));
             harmony.Patch(
                 sayLineMyRun,
-                prefix: preventTalk
-            );
+                prefix: preventTalk);
         }
 
         public static bool PreventTalk(ref BTresult __result)
