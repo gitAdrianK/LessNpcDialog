@@ -1,27 +1,25 @@
-﻿using System.ComponentModel;
-using System.Runtime.CompilerServices;
-
 namespace LessNpcDialog
 {
+    using System.ComponentModel;
+    using System.Runtime.CompilerServices;
+
     public class Preferences : INotifyPropertyChanged
     {
-        private bool _isEnabled = true;
+        private bool isEnabled = true;
 
         public bool IsEnabled
         {
-            get => _isEnabled;
+            get => this.isEnabled;
             set
             {
-                _isEnabled = value;
-                OnPropertyChanged();
+                this.isEnabled = value;
+                this.OnPropertyChanged();
             }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

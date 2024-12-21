@@ -1,31 +1,30 @@
-﻿using BehaviorTree;
-using HarmonyLib;
-using JumpKing.MiscEntities.OldMan;
-using JumpKing.Mods;
-using JumpKing.PauseMenu;
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Reflection;
-
-namespace LessNpcDialog
+﻿namespace LessNpcDialog
 {
+    using System;
+    using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
+    using System.IO;
+    using System.Reflection;
+    using BehaviorTree;
+    using HarmonyLib;
+    using JumpKing.MiscEntities.OldMan;
+    using JumpKing.Mods;
+    using JumpKing.PauseMenu;
+
     [JumpKingMod(IDENTIFIER)]
     public static class ModEntry
     {
-        const string IDENTIFIER = "Zebra.LessNpcDialog";
-        const string HARMONY_IDENTIFIER = "Zebra.LessNpcDialog.Harmony";
-        const string SETTINGS_FILE = "Zebra.LessNpcDialog.Settings.xml";
+        private const string IDENTIFIER = "Zebra.LessNpcDialog";
+        private const string HARMONY_IDENTIFIER = "Zebra.LessNpcDialog.Harmony";
+        private const string SETTINGS_FILE = "Zebra.LessNpcDialog.Settings.xml";
 
         private static string AssemblyPath { get; set; }
         public static Preferences Preferences { get; private set; }
 
         [MainMenuItemSetting]
         [PauseMenuItemSetting]
-        public static ToggleEnabled Toggle(object factory, GuiFormat format)
-        {
-            return new ToggleEnabled();
-        }
+        [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Required for JK")]
+        public static ToggleEnabled Toggle(object factory, GuiFormat format) => new ToggleEnabled();
 
         /// <summary>
         /// Called by Jump King before the level loads
@@ -46,14 +45,15 @@ namespace LessNpcDialog
             }
             Preferences.PropertyChanged += SaveSettingsOnFile;
 
-            Harmony harmony = new Harmony(HARMONY_IDENTIFIER);
-            MethodInfo sayLineMyRun = typeof(SayLine).GetMethod("MyRun", BindingFlags.NonPublic | BindingFlags.Instance);
-            HarmonyMethod preventTalk = new HarmonyMethod(typeof(ModEntry).GetMethod(nameof(PreventTalk)));
-            harmony.Patch(
+            var harmony = new Harmony(HARMONY_IDENTIFIER);
+            var sayLineMyRun = typeof(SayLine).GetMethod("MyRun", BindingFlags.NonPublic | BindingFlags.Instance);
+            var preventTalk = new HarmonyMethod(typeof(ModEntry).GetMethod(nameof(PreventTalk)));
+            _ = harmony.Patch(
                 sayLineMyRun,
                 prefix: preventTalk);
         }
 
+        [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Harmony naming convention")]
         public static bool PreventTalk(ref BTresult __result)
         {
             if (Preferences.IsEnabled)
